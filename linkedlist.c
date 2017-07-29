@@ -19,7 +19,7 @@ struct LinkedList create_linked_list(){
     linkedList.size = 0;
     linkedList.head = NULL;
     linkedList.tail = NULL;
-    
+
     return linkedList;
 }
 
@@ -81,6 +81,26 @@ int value_at(struct LinkedList *linkedList, int index){
     return -1;
 }
 
+struct LinkedList insert_at(struct LinkedList *linkedList, int index, int data){
+    struct LinkedListNode *head = linkedList->head;
+
+    for(int i = 0; i <= linkedList->size; i++){
+        if(i+1 == index){
+            struct LinkedListNode *linkedListNode = malloc_linkedlistnode();
+            linkedListNode->data = data;
+            linkedListNode->next = head->next;
+            head->next = linkedListNode;
+            linkedList->size++;
+
+            return *linkedList;
+        }
+
+        head = head->next;
+    }
+
+    return *linkedList;
+}
+
 int front(struct LinkedList *linkedList){
     return linkedList->head->data;
 }
@@ -106,8 +126,11 @@ int main(){
 
     printf("List is %s\n", (linkedList.size ? "not empty" : "empty"));
 
+    linkedList = insert_at(&linkedList, 3, 1000);
+
     printf("Value at 1: %d\n", value_at(&linkedList, 1));
     printf("Value at 5: %d\n", value_at(&linkedList, 5));
+    printf("Value at 3: %d\n", value_at(&linkedList, 3));
     printf("Front: %d\n", front(&linkedList));
     printf("Back: %d\n", back(&linkedList));
 
