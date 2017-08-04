@@ -32,11 +32,14 @@ struct LinkedListNode *malloc_linkedlistnode(){
 struct LinkedList append(struct LinkedList *linkedList, int data){
     struct LinkedListNode *linkedListNode = malloc_linkedlistnode();
     linkedListNode->data = data;
-    linkedList->tail->next = linkedListNode;
     linkedListNode->next = NULL;
 
-    linkedList->tail = linkedListNode;
-
+    if(linkedList->tail == NULL){
+        linkedList->tail = linkedListNode; 
+    }else{
+        linkedList->tail->next = linkedListNode;    
+    }
+    
     if(linkedList->head == NULL){
         linkedList->head = linkedListNode;
     }
@@ -81,6 +84,31 @@ int value_at(struct LinkedList *linkedList, int index){
     return -1;
 }
 
+int pop_front(struct LinkedList *linkedList){
+    struct LinkedListNode *head = linkedList->head;
+    linkedList->head = linkedList->head->next;
+    linkedList->size--;
+    return head->data;
+}
+
+int pop_back(struct LinkedList *linkedList){
+    struct LinkedListNode *head = linkedList->head;
+    struct LinkedListNode *previous = linkedList->head;
+
+    for(int i = 0; i <= linkedList->size; i++){
+        if(head->next == NULL){
+            previous->next = NULL;
+            return head->data;
+        }
+
+        previous = head;
+        head = head->next;
+    }
+
+    linkedList->size--;
+    return head->data;
+}
+
 struct LinkedList insert_at(struct LinkedList *linkedList, int index, int data){
     struct LinkedListNode *head = linkedList->head;
 
@@ -95,6 +123,40 @@ struct LinkedList insert_at(struct LinkedList *linkedList, int index, int data){
             return *linkedList;
         }
 
+        head = head->next;
+    }
+
+    return *linkedList;
+}
+
+struct LinkedList erase(struct LinkedList *linkedList, int index){
+    struct LinkedListNode *head = linkedList->head;
+
+    for(int i = 0; i <= linkedList->size; i++){
+        if(i+1 == index){
+            head->next = head->next->next;
+            linkedList->size--;
+            return *linkedList;
+        }
+
+        head = head->next;
+    }
+
+    return *linkedList;
+}
+
+struct LinkedList remove_value(struct LinkedList *linkedList, int value){
+    struct LinkedListNode *head = linkedList->head;
+    struct LinkedListNode *previous = linkedList->head;
+
+    for(int i = 0; i <= linkedList->size; i++){
+        if(head->data == value){
+            previous->next = head->next;
+            linkedList->size--;
+            return *linkedList;
+        }
+
+        previous = head;
         head = head->next;
     }
 
@@ -116,13 +178,10 @@ int main(){
     printf("List is %s\n", (linkedList.size ? "not empty" : "empty"));
 
     for(int i = 0; i <= 10; i++){
-        linkedList = prepend(&linkedList, i * 2);
+        prepend(&linkedList, i * 2);
     }
 
     linkedList = append(&linkedList, 100);
-
-    struct LinkedListNode head = *linkedList.head;
-    struct LinkedListNode tail = *linkedList.tail;
 
     printf("List is %s\n", (linkedList.size ? "not empty" : "empty"));
 
@@ -134,16 +193,31 @@ int main(){
     printf("Front: %d\n", front(&linkedList));
     printf("Back: %d\n", back(&linkedList));
 
+    printf("Pop front %d\n", pop_front(&linkedList));
+    printf("Pop front %d\n", pop_front(&linkedList));
+    printf("Pop front %d\n", pop_front(&linkedList));
+
+    append(&linkedList, 1337);
+    printf("Pop back: %d\n", pop_back(&linkedList));
+
+    remove_value(&linkedList, 4);
+    remove_value(&linkedList, 6);
+
+    struct LinkedListNode *head = linkedList.head;
+    struct LinkedListNode *tail = linkedList.tail;
+
     for(int i = 0; i <= linkedList.size; i++){
-        if(head.next == NULL){
+        if(head->next == NULL){
             printf("Size of list: %d\n", linkedList.size);
             exit(0);
         }
 
         if(i != 0){
-            head = *head.next;
+            head = head->next;
         }
 
-        printf("Index %d: %d\n", i, head.data);
+        printf("Index %d: %d\n", i, head->data);
     }
+
+    free(&linkedList);
 }
